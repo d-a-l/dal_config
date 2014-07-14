@@ -1,0 +1,84 @@
+{% extends "base.j2" %}
+{% from "macros.j2" import render_tags with context  %}
+{% import 'embed_media.j2' as embed %} 
+{% import 'images.j2' as img %} 
+
+{% block endhead %}
+{% include "juvia.j2" %}
+{% endblock endhead %}
+
+{% block bodyclasses %}class="{{resource.meta.custom_body_classes}}"{% endblock bodyclasses %}
+
+{% block main -%}
+<article class="post">
+{#
+<a class="edit" rel="nofollow" title="edit in github" href="https://github.com/d-a-l/derechoaleer/blob/master/content{{ content_url(resource.url) }}" target="_blank">^</a>
+<a class="edit" rel="nofollow" title="edit in dal script" href="http://localdal/edit.php?nid={{ resource.meta.nid }}" target="_blank">^</a>
+#}
+
+<h1 class="title">
+    <a href="{{ content_url(resource.url) }}">
+        {{ resource.meta.title }}
+    </a>
+</h1>
+
+{% mark post -%}
+{% filter markdown2|typogrify -%}
+{% block post -%}{%- endblock %}
+{%- endfilter %}
+{% if self.notas() %}
+<hr>
+<div class="notas">
+{% filter markdown2|typogrify -%}
+{% block notas -%}{%- endblock %}
+{%- endfilter %}
+</div>
+{% endif %}
+{%- endmark %}
+
+<hr>
+
+{% if resource.meta.license %}
+{% include "license.j2" %} 
+{% endif %}
+
+<div class="meta-bottom">
+<p class="meta-post"><span class="lk">{{ t['permanent_link'] }}: <a href="{{ site.config.url_domain }}{{ content_url(resource.url) }}">{{ site.config.url_domain }}{{ content_url(resource.url) }}</a></span></p>
+<p class="meta-post">{{ t['published'] }} <span class="ap inline">{{ resource.meta.author }}</span> &mdash; <time class="inline" datetime="{{ resource.meta.created.strftime('%Y-%m-%d') }}">{{ resource.meta.created.strftime('%d|%m|%Y') }}</time></p>
+<hr class="post-bottom">
+{% if resource.meta.tags %}
+    {{ render_tags(resource, 'tags') }}
+{% endif %}
+</div>
+{% if resource.meta.comments_status == 'open' %}
+<div class="comments" id="comments"></div>
+{% endif %}
+</article>
+
+ <nav class="post_nav">
+
+{% if resource.meta.next_post_nav %}
+
+ {% if resource.next_by_time_es %}
+    <p class="anterior">{{ t['prev'] }}: <a class="prev{{' disabled' if not resource.next_by_time_es }}"
+       title="{{ resource.next_by_time_es.meta.title }}"
+       href="{{ content_url(resource.next_by_time_es.url) }}">
+       "{{ resource.next_by_time_es.meta.title }}"
+    </a>.</p>
+ {% endif %}
+
+ {% if resource.prev_by_time_es %}
+   <p class="siguiente">{{ t['next'] }}: <a class="next{{' disabled' if not resource.prev_by_time_es }}"
+       title="{{ resource.prev_by_time_es.meta.title }}"
+       href="{{ content_url(resource.prev_by_time_es.url) }}">
+       "{{ resource.prev_by_time_es.meta.title}}"
+   </a>.</p>
+ {% endif %}
+
+{% endif %}
+
+   <p class="volver">{{ m.get_back_to_home_link(resource.meta.language) }}.</p>
+
+</nav>
+
+{%- endblock %}
